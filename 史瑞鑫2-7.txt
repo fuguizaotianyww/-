@@ -1,0 +1,80 @@
+//4.2保存职工工资数据函数：save()
+	void Save()
+	{
+		ofstream fs("gx.dat");
+		for (auto it = _works.begin(); it != _works.end(); it++)
+		{
+			fs << it->id << "=" << it->name << "=" << it->gwgz << "=" << it->xjgz << "=" <<
+				it->zwjt<< "=" << it->jxgz << "=" << it->yfgz << "=" << it->grssds << "=" << it->sfgz << endl;
+		}
+		fs.close();
+	}
+
+	//4.3查询职工工资数据函数：find()
+	void Find(const string &id)
+	{
+		auto result = this->Get(id);
+		if (result != _works.end())
+			result->Print();
+	}
+
+	//4.4浏览职工工资数据函数：listInfo()
+	void ListInfo()
+	{
+		for (auto it = _works.begin(); it != _works.end(); it++)
+		{
+			it->Print();
+		}
+	}
+
+	//4.5修改职工工资数据函数：modify()
+	void Modify(const string &id, float postWages, float paySalary, float jobAllowance, float performancePay)
+	{
+		auto result = this->Get(id);
+		if (result != _works.end())
+		{
+			result->gwgz = postWages;
+			result->xjgz = paySalary;
+			result->zwjt = jobAllowance;
+			result->jxgz = performancePay;
+			grsds()(id);
+			Save(); 
+		}
+	}
+
+	//4.6删除职工工资数据函数：del()
+	void del(const string &id)
+	{
+		auto result = this->Get(id);
+		if (result != _works.end())
+		{
+			_works.erase(result);
+			Save(); 
+		}
+	}
+
+	//4.7添加职工工资数据函数：add()
+	bool add(const string &id, const string &name, float postWages, float paySalary, float jobAllowance, float performancePay)
+	{
+		if (!Utility::StringIsNumber(id))
+			return false;
+
+		auto result = this->Get(id);
+		if (result == _works.end())
+		{
+			WorkerInfo wi;
+			wi.id = id;								//工号
+			wi.name = name;							//姓名
+			wi.gwgz = postWages;				    //岗位工资 
+			wi.xjgz = paySalary;				    //薪级工资
+			wi.zwjt = jobAllowance;			        //职务津贴
+			wi.jxgz = performancePay;               //绩效工资
+
+			_works.push_back(wi);			//插入到双向链表尾部
+			this->grsds()(id);				
+
+			Save();
+			return true;
+		}
+		return false;
+	}
