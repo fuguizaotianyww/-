@@ -1,426 +1,62 @@
-/***************************************************************************
-ÎÄ¼şÃû³Æ£º¿Î³ÌÉè¼Æ.cpp
-×÷Õß£ºÊ·ÈğöÎ    ´´½¨ÈÕÆÚ£º2018-06-22
-°æ±¾£º0.1
-ÎÄ¼şËµÃ÷£º¿Î³ÌÉè¼ÆºÍ¿ØÖÆ½çÃæ²Ù×÷
-Ö÷Òªº¯Êı¼°¹¦ÄÜ£º
-void read£¨£©  ¶ÁÈ¡Ö°¹¤¹¤×ÊÊı¾İº¯Êı
-void save£¨£©  ±£´æÖ°¹¤¹¤×ÊÊı¾İº¯Êı
-void find£¨£©  ²éÑ¯Ö°¹¤¹¤×ÊÊı¾İº¯Êı
-void listinfo£¨£©  ä¯ÀÀÖ°¹¤¹¤×ÊÊı¾İº¯Êı
-void modify£¨£©  ĞŞ¸ÄÖ°¹¤¹¤×ÊÊı¾İº¯Êı
-void del£¨£©  É¾³ıÖ°¹¤¹¤×ÊÊı¾İº¯Êı
-bool add£¨£©  Ìí¼ÓÖ°¹¤¹¤×ÊÊı¾İº¯Êı
-void grsds£¨£©  ¼ÆËã¸öÈËËùµÃË°º¯Êı
-ÀúÊ·ĞŞ¸Ä¼ÇÂ¼£º
-<×÷Õß>        <Ê±¼ä>        <°æ±¾>    
-Ê·ÈğöÎ        18/6/29        0.1
-****************************************************************************/
-
-#ifndef _INC_H_
-#define _INC_H_
-#include <string>
-#include <iostream>
-#include <vector>
-#include <io.h>
-#include <iostream>
-#include <list>
-#include <fstream>
+#include<stdio.h>
+#include<fstream>
 using namespace std;
+int grsds(float a);
+void menu();
+struct zggz{
+   int id;
+   int gongh;
+   char name[20];
+   float gwgz,xinjgz,zwjt;
+   float xiaojgz;
+   float yfgz,sfgz;
+   float grs;
+};
+zggz zggz0[50],*p;   //å…¨å±€å˜é‡æ•°ç»„ï¼Œç»“æ„ä½“æŒ‡é’ˆ
+int number,oup;      //å…¨å±€å˜é‡ç»Ÿè®¡äººæ•°
 
-namespace Utility
+void read()     //è¯»å–å‡½æ•°
 {
-	inline std::vector<std::string> SplitString(const std::string &str, const std::string &pattern)
-	{
-		std::vector<std::string> vec;
-		std::string strs = str + pattern;
+		FILE *fp;
+    if((fp=fopen("gz.dat","rb"))==NULL) //åˆ¤æ–­æ–‡ä»¶æ˜¯å¦å­˜åœ¨
+    {
+      fp=fopen("gz.dat","wb");          //å¦‚æœæ–‡ä»¶ä¸å­˜åœ¨ï¼Œæ–°å»ºä¸€ä¸ªæ–‡ä»¶
+    }
+    fclose(fp);                         //å…³é—­æ–‡ä»¶
 
-		size_t pos = strs.find(pattern);
-		size_t size = strs.size();
-
-		while (pos != std::string::npos)
-		{
-			std::string x = strs.substr(0, pos);
-			vec.push_back(x);
-			strs = strs.substr(pos + 1, size);
-			pos = strs.find(pattern);
-		}
-		return vec;
-	}
-
-	inline std::string StringTrim(std::string str)
-	{
-		std::string temp;
-		for (size_t i = 0; i < str.length(); i++)
-		{
-			if (str.at(i) != ' ' && str.at(i) != '\t')
-			{
-				temp += str.at(i);
-			}
-		}
-		return temp;
-	}
-
-	inline bool StringIsNumber(std::string str)
-	{
-		for (size_t i = 0; i < str.length(); i++)
-		{
-			if (str.at(i) < '0' || str.at(i) > '9')
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	inline bool IsExistFile(string csPath)
-	{
-		int nRet = _access(csPath.c_str(), 0);
-		return 0 == nRet || EACCES == nRet;
-	}
-
-	inline float StringToFloat(string str)
-	{
-		return (float)atof(str.c_str());
-	}
-}
-#endif 
-struct WorkerInfo
-{ 
-	string id;		//¹¤ºÅ
-	string name;	//ĞÕÃû
-	float gwgz;		//¸ÚÎ»¹¤×Ê 
-	float xjgz;		//Ğ½¼¶¹¤×Ê
-	float zwjt;     //Ö°Îñ½òÌù
-	float jxgz;     //¼¨Ğ§¹¤×Ê
-	float yfgz;		//Ó¦·¢¹¤×Ê
-	float grssds;	//¸öÈËËùµÃË°
-	float sfgz;		//Êµ·¢¹¤×Ê
-
-	void Print()
-	{
-		cout << "*****************************************************************************\r\n";
-		cout << "¹¤ºÅ£º" << id << " ĞÕÃû£º" << name << endl;
-		cout << "¸ÚÎ»¹¤×Ê£º" << gwgz << " Ğ½¼¶¹¤×Ê£º" << xjgz << " Ö°Îñ½òÌù£º" << zwjt << " ¼¨Ğ§¹¤×Ê£º" << jxgz << endl;
-		cout << "Ó¦·¢¹¤×Ê£º" << yfgz << " ¸öÈËËùµÃË°£º" << grssds << " Êµ·¢¹¤×Ê£º" << sfgz << endl;
-		cout << "*****************************************************************************\r\n";
+    ifstream in("gz.dat",ios::binary);
+    if(!in)
+    {
+        printf("Cannot open output file.\n");
+	    abort();  //é€€å‡ºç¨‹åº
+    }
+    in.read((char *)&::zggz0,sizeof(::zggz0));
+    in.close();//å…³é—­æ–‡ä»¶
+    for(int n=0;n<50;n++)
+	{ 
+	    if(zggz0[n].gongh!=NULL)
+	    number=n+1;
+	    else
+		break;
 	}
 };
-class WagesManager
-{
-public:
-	WagesManager()
+
+void write(zggz *p,int k){   //ä¿å­˜å‡½æ•°
+	ofstream out("gz.dat",ios::binary);
+	if(!out)
 	{
-		this->Read();
+	    printf("Cannot open output file.\n");
+	    abort();//é€€å‡ºç¨‹åº
 	}
-
-	bool IsExistWorker(string id)
+	for(int i=0;i<k;i++)
 	{
-		return this->Get(id) != _works.end();
+		out.write((char *)&*p,sizeof(*p));
+        p++;
 	}
-
-	//4.1¶ÁÈ¡Ö°¹¤¹¤×ÊÊı¾İº¯Êı£ºread()
-	void Read()
-	{
-		_works.clear();
-		if (Utility::IsExistFile("gx.dat"))  //Êı¾İÎÄ¼ş´æÔÚ
-		{
-			fstream fs;
-			fs.open("gx.dat", ios::in | ios::out);
-			char buff[1024] = {0};
-			while (fs.getline(buff, 1024)) 
-			{
-				auto vec = Utility::SplitString(buff, "="); 
-	
-				WorkerInfo wi;
-				wi.id = vec.at(0);								//¹¤ºÅ
-				wi.name = vec.at(1);							//ĞÕÃû
-				wi.gwgz = Utility::StringToFloat(vec.at(2));	//¸ÚÎ»¹¤×Ê 
-				wi.xjgz = Utility::StringToFloat(vec.at(3));	//Ğ½¼¶¹¤×Ê
-				wi.zwjt = Utility::StringToFloat(vec.at(4));	//Ö°Îñ½òÌù
-				wi.jxgz = Utility::StringToFloat(vec.at(5));    //¼¨Ğ§¹¤×Ê
-				wi.yfgz = Utility::StringToFloat(vec.at(6));	//Ó¦·¢¹¤×Ê
-				wi.grssds = Utility::StringToFloat(vec.at(7));	//¸öÈËËùµÃË°
-				wi.sfgz = Utility::StringToFloat(vec.at(8));	//Êµ·¢¹¤×Ê
-
-				_works.push_back(wi);
-			}
-			fs.close();
-		}
-	}
-
-	//4.2±£´æÖ°¹¤¹¤×ÊÊı¾İº¯Êı£ºsave()
-	void Save()
-	{
-		ofstream fs("gx.dat");
-		for (auto it = _works.begin(); it != _works.end(); it++)
-		{
-			fs << it->id << "=" << it->name << "=" << it->gwgz << "=" << it->xjgz << "=" <<
-				it->zwjt<< "=" << it->jxgz << "=" << it->yfgz << "=" << it->grssds << "=" << it->sfgz << endl;
-		}
-		fs.close();
-	}
-
-	//4.3²éÑ¯Ö°¹¤¹¤×ÊÊı¾İº¯Êı£ºfind()
-	void Find(const string &id)
-	{
-		auto result = this->Get(id);
-		if (result != _works.end())
-			result->Print();
-	}
-
-	//4.4ä¯ÀÀÖ°¹¤¹¤×ÊÊı¾İº¯Êı£ºlistInfo()
-	void ListInfo()
-	{
-		for (auto it = _works.begin(); it != _works.end(); it++)
-		{
-			it->Print();
-		}
-	}
-
-	//4.5ĞŞ¸ÄÖ°¹¤¹¤×ÊÊı¾İº¯Êı£ºmodify()
-	void Modify(const string &id, float postWages, float paySalary, float jobAllowance, float performancePay)
-	{
-		auto result = this->Get(id);
-		if (result != _works.end())
-		{
-			result->gwgz = postWages;
-			result->xjgz = paySalary;
-			result->zwjt = jobAllowance;
-			result->jxgz = performancePay;
-			grsds(id);
-			Save(); 
-		}
-	}
-
-	//4.6É¾³ıÖ°¹¤¹¤×ÊÊı¾İº¯Êı£ºdel()
-	void del(const string &id)
-	{
-		auto result = this->Get(id);
-		if (result != _works.end())
-		{
-			_works.erase(result);
-			Save(); 
-		}
-	}
-
-	//4.7Ìí¼ÓÖ°¹¤¹¤×ÊÊı¾İº¯Êı£ºadd()
-	bool add(const string &id, const string &name, float postWages, float paySalary, float jobAllowance, float performancePay)
-	{
-		if (!Utility::StringIsNumber(id))
-			return false;
-
-		auto result = this->Get(id);
-		if (result == _works.end())
-		{
-			WorkerInfo wi;
-			wi.id = id;								//¹¤ºÅ
-			wi.name = name;							//ĞÕÃû
-			wi.gwgz = postWages;				    //¸ÚÎ»¹¤×Ê 
-			wi.xjgz = paySalary;				    //Ğ½¼¶¹¤×Ê
-			wi.zwjt = jobAllowance;			        //Ö°Îñ½òÌù
-			wi.jxgz = performancePay;               //¼¨Ğ§¹¤×Ê
-
-			_works.push_back(wi);			//²åÈëµ½Ë«ÏòÁ´±íÎ²²¿
-			this->grsds(id);				
-
-			Save();
-			return true;
-		}
-		return false;
-	}
-
-
-	//4.8¼ÆËã¸öÈËËùµÃË°º¯Êı£ºgrsds()
-	/*²»³¬¹ı500ÔªµÄ£¬Ë°ÂÊ5%£¬ËÙËã¿Û³ıÊıÎª0£» 
-      ³¬¹ı500ÔªÖÁ2000ÔªµÄ²¿·Ö£¬Ë°ÂÊ10%£¬ËÙËã¿Û³ıÊıÎª25 
-      ³¬¹ı2000ÔªÖÁ5000ÔªµÄ²¿·Ö£¬Ë°ÂÊ15 %£¬ËÙËã¿Û³ıÊıÎª125 
-      ³¬¹ı5000ÔªÖÁ20000ÔªµÄ²¿·Ö£¬Ë°ÂÊ20 %£¬ËÙËã¿Û³ıÊıÎª375 
-      ³¬¹ı20000ÔªÖÁ40000ÔªµÄ²¿·Ö£¬Ë°ÂÊ25%£¬ËÙËã¿Û³ıÊıÎª1375 
-      ³¬¹ı40000ÔªÖÁ60000ÔªµÄ²¿·Ö£¬Ë°ÂÊ30%£¬ËÙËã¿Û³ıÊıÎª3375 
-      ³¬¹ı60000ÔªÖÁ80000ÔªµÄ²¿·Ö£¬Ë°ÂÊ35%£¬ËÙËã¿Û³ıÊıÎª6375 
-      ³¬¹ı80000ÔªÖÁ100000ÔªµÄ²¿·Ö£¬Ë°ÂÊ40%£¬ËÙËã¿Û³ıÊıÎª10375 
-      ³¬¹ı100000ÔªµÄ²¿·Ö£¬Ë°ÂÊ45%£¬ËÙËã¿Û³ıÊıÎª15375 */
-
-	void grsds(const string &id)
-	{
-		auto w = this->Get(id);
-		if (w != _works.end())
-		{
-			//Ó¦·¢¹¤×Ê = ¸ÚÎ»¹¤×Ê +Ğ½¼¶¹¤×Ê+Ö°Îñ½òÌù+¼¨Ğ§¹¤×Ê
-			w->yfgz = w->gwgz + w->xjgz + w->zwjt + w->jxgz;
-
-			//3500ÆğÔöµã
-			float a = w->yfgz - 3500;
-
-			//²»¹»3500
-			if (a <= 0)
-			{
-				w->grssds = 0;
-				w->sfgz = w->yfgz;
-			}
-			else
-			{
-				//Ó¦ÄÉ¸öÈËËùµÃË°Ë°¶î=Ó¦ÄÉË°ËùµÃ¶î¡ÁÊÊÓÃË°ÂÊ-ËÙËã¿Û³ıÊı
-				if (a > 0 && a <= 500)
-					w->grssds = a * 0.05f - 0;
-				else if (a > 500 && a <= 2000)
-					w->grssds = a * 0.1f - 25;
-				else if (a > 2000 && a <= 5000)
-					w->grssds = a * 0.15f - 125;
-				else if (a > 5000 && a <= 20000)
-					w->grssds = a * 0.2f - 375;
-				else if (a > 20000 && a <= 40000)
-					w->grssds = a * 0.25f - 1375;
-				else if (a > 40000 && a <= 60000)
-					w->grssds = a * 0.3f - 3375;
-				else if (a > 60000 && a <= 80000)
-					w->grssds = a * 0.35f - 6375;
-				else if (a > 80000 && a <= 100000)
-					w->grssds = a * 0.4f - 10375;
-				else
-					w->grssds = a * 0.45f - 15505;
-
-				//Êµ·¢¹¤×Ê = Ó¦¸¶¹¤×Ê - Ë°
-				w->sfgz = w->yfgz - w->grssds;
-			}
-		}
-	}
-private:
-	//Í¨¹ıÖ°¹¤¹¤ºÅid·µ»ØË«ÏòÁ´±íµü´úÆ÷Ö¸Õë
-	list<WorkerInfo>::iterator Get(string id)
-	{
-		list<WorkerInfo>::iterator result = _works.end();
-		for (auto it = _works.begin(); it != _works.end(); it++)
-		{
-			if (id == it->id)
-			{
-				result = it;
-				break;
-			}
-		}
-		return result;
-	}
-
-	list<WorkerInfo> _works;  
+	out.close();
+    printf("ä¿å­˜æˆåŠŸ");//cout<<"ä¿å­˜æˆåŠŸ"<<endl;	
+    printf("å³å°†è¿”å›èœå•  ");//cout<<"å³å°†è¿”å›èœå•"<<"  ";
+    system("pause");
+    read();	
+    menu();   //è°ƒç”¨èœå•
 };
-
-//ÏÔÊ¾½çÃæ
-void ShowMainMenu()
-{
-	system("cls");
-	printf("       ###   »¶Ó­Ê¹ÓÃ¹ãÎ÷Ãñ×å´óÑ§Èí¼şÓëĞÅÏ¢°²È«Ñ§ÔºÖ°¹¤¹¤×Ê¹ÜÀíÏµÍ³   ###\n");
-	printf("\n");
-	printf("       ÇëÑ¡Ôñ<1-7>:\n");
-	printf("       ==================================================================\n");
-	printf("       |            1²éÑ¯Ö°¹¤¹¤×Ê¼ÇÂ¼                                   |\n");
-	printf("       |            2ĞŞ¸ÄÖ°¹¤¹¤×Ê¼ÇÂ¼                                   |\n");
-	printf("       |            3Ìí¼ÓÖ°¹¤¹¤×Ê¼ÇÂ¼                                   |\n");
-	printf("       |            4É¾³ıÖ°¹¤¹¤×Ê¼ÇÂ¼                                   |\n");
-	printf("       |            5±£´æÊı¾İµ½ÎÄ¼ş                                     |\n");
-	printf("       |            6ä¯ÀÀÖ°¹¤¼ÇÂ¼                                       |\n");
-	printf("       |            7ÍË³öÏµÍ³                                           |\n");
-	printf("       ==================================================================\n");
-	printf("\n");
-	printf("       ÄãµÄÑ¡ÔñÊÇ£º \n");
-	
-}
-
-int main()
-{ 
-	WagesManager wm;	
-	while (true)
-	{
-		ShowMainMenu();
-		string id;				//¹¤ºÅ
-		string name;			//ĞÕÃû
-		float gwgz;		        //¸ÚÎ»¹¤×Ê 
-		float xjgz;		        //Ğ½¼¶¹¤×Ê
-		float zwjt;             //Ö°Îñ½òÌù
-		float jxgz;             //¼¨Ğ§¹¤×Ê
-		string isDelete;		//È·ÈÏÊÇ·ñÉ¾³ı
-		int flag = -1;
-		cin >> flag;
-		switch (flag)
-		{
-		case 1:			
-			cout << "ÇëÊäÈë²éÑ¯µÄ¹¤ºÅ" << endl;
-			cin >> id;
-			if (!wm.IsExistWorker(id))
-			{
-				cout << "²»´æÔÚ¸ÃÔ±¹¤,²éÑ¯Ê§°Ü" << endl;
-				break;
-			}
-			wm.Find(id);
-			break;
-		case 2:			
-			cout << "ÇëÊäÈëĞŞ¸ÄµÄ¹¤ºÅ" << endl;
-			cin >> id;
-			if (!wm.IsExistWorker(id))
-			{
-				cout << "²»´æÔÚ¸ÃÔ±¹¤,ĞŞ¸ÄÊ§°Ü" << endl;
-				break;
-			}
-			cout << "ÇëÖØĞÂÊäÈë¸ÚÎ»¹¤×Ê" << endl;
-			cin >> gwgz;
-			cout << "ÇëÖØĞÂÊäÈëĞ½¼¶¹¤×Ê" << endl;
-			cin >> xjgz;
-			cout << "ÇëÖØĞÂÊäÈëÖ°Îñ½òÌù" << endl;
-			cin >> zwjt;
-			cout << "ÇëÖØĞÂÊäÈë¼¨Ğ§¹¤×Ê" << endl;
-			cin >> jxgz;
-			wm.Modify(id, gwgz, xjgz, zwjt, jxgz);
-			break;
-		case 3:			
-			cout << "ÇëÊäÈëÌí¼ÓµÄ¹¤ºÅ" << endl;
-			cin >> id;
-			if (wm.IsExistWorker(id))
-			{
-				cout << "Ìí¼ÓÊ§°Ü,Ô±¹¤IDÒÑ¾­´æÔÚ" << endl;
-				break;
-			}
-			cout << "ÇëÊäÈëÌí¼ÓµÄĞÕÃû" << endl;
-			cin >> name;
-			cout << "ÇëÊäÈë¸ÚÎ»¹¤×Ê" << endl;
-			cin >> gwgz;
-			cout << "ÇëÊäÈëĞ½¼¶¹¤×Ê" << endl;
-			cin >> xjgz;
-			cout << "ÇëÊäÈëÖ°Îñ½òÌù" << endl;
-			cin >> zwjt;
-			cout << "ÇëÊäÈë¼¨Ğ§¹¤×Ê" << endl;
-			cin >> jxgz;
-
-			wm.add(id, name, gwgz, xjgz, zwjt, jxgz);
-			break;
-		case 4:		
-			cout << "ÇëÊäÈëÉ¾³ıµÄ¹¤ºÅ" << endl;
-			cin >> id;
-			if (wm.IsExistWorker(id))
-			{
-				cout << "È·ÈÏÉ¾³ı£ºY\tÈ¡ÏûÉ¾³ıN" << endl;
-				cin >> isDelete;
-				if (isDelete == "Y" || isDelete == "y")
-				{
-					wm.del(id);
-					cout << "É¾³ı³É¹¦" << endl;
-				}
-			}
-			else
-				cout << "É¾³ıÊ§°Ü£¬²»´æÔÚ¸ÃÔ±¹¤" << endl;
-
-			break;
-		case 5:		
-			wm.Save();
-			break;
-		case 6:		
-			wm.ListInfo();
-			break;
-		case 7:		
-			return 0;
-		default:
-			break;
-		}
-		system("pause");
-	}
-	return 0;
-}
