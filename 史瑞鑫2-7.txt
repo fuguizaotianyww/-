@@ -1,308 +1,144 @@
-/
-#ifndef _INC_H_
-#define _INC_H_
-#include <string>
-#include <iostream>
-#include <vector>
-#include <io.h>
-#include <iostream>
-#include <list>
-#include <fstream>
-using namespace std;
+void write(zggz *p,int k){   //保存函数
+	ofstream out("gz.dat",ios::binary);
+	if(!out)
+	{
+	    printf("Cannot open output file.\n");
+	    abort();//退出程序
+	}
+	for(int i=0;i<k;i++)
+	{
+		out.write((char *)&*p,sizeof(*p));
+        p++;
+	}
+	out.close();
+    printf("保存成功");//cout<<"保存成功"<<endl;	
+    printf("即将返回菜单  ");//cout<<"即将返回菜单"<<"  ";
+    system("pause");
+    read();	
+    menu();   //调用菜单
+};
 
-
-namespace Utility
+void find()     //查询函数
 {
-	inline std::vector<std::string> SplitString(const std::string &str, const std::string &pattern)
+	 int k,i=0,w;
+     loop:   printf("请输入你要查询的工号\n");
+     scanf("%d",&k);
+	 for(int j=0;j<number;j++)
+     {    
+		 if (k==zggz0[j].gongh)
+		 {
+			 printf("职员信息如下：\n");
+				 printf("工号\t姓名\t岗位工资\t薪级工资\t职务工资\t效绩工资\t应发工资\t实发工资\n");
+		         printf("%d\t%s\t%g\t\t%g\t\t%g\t\t%g\t\t%g\t\t%g\n",
+					 zggz0[j].gongh,
+					 zggz0[j].name,
+					 zggz0[j].gwgz,
+					 zggz0[j].xinjgz,
+					 zggz0[j].zwjt,
+					 zggz0[j].xiaojgz,
+					 zggz0[j].yfgz,
+					 zggz0[j].sfgz);
+	              i=k;
+				 printf("重新查询（1），菜单（任意键）\n");
+				 scanf("%d",&w);
+			     if(w==1)
+				   goto loop;
+			     else 
+				   menu();
+				 }
+		  }
+		  if(i!=k)
+		  {
+		      printf("没有这个职员的信息，重新查询（1），菜单（任意键）\n");
+		      scanf("%d",&w);
+		      if(w==1)
+		      goto loop;
+		      else 
+		      menu();
+		  }	   
+};//查询
+
+void list(int k)      //浏览职员信息函数
+{  
+	printf("共有%d人,所有信息如下：\n",k);
+	if(k!=0)
 	{
-		std::vector<std::string> vec;
-		std::string strs = str + pattern;
-
-		size_t pos = strs.find(pattern);
-		size_t size = strs.size();
-
-		while (pos != std::string::npos)
-		{
-			std::string x = strs.substr(0, pos);
-			vec.push_back(x);
-			strs = strs.substr(pos + 1, size);
-			pos = strs.find(pattern);
-		}
-		return vec;
+	    printf("工号\t姓名\t岗位工资\t薪级工资\t职务工资\t效绩工资\t应发工资\t实发工资\n");
 	}
-
-	inline std::string StringTrim(std::string str)
+	for(int i=0;i<number;i++)
 	{
-		std::string temp;
-		for (size_t i = 0; i < str.length(); i++)
-		{
-			if (str.at(i) != ' ' && str.at(i) != '\t')
-			{
-				temp += str.at(i);
-			}
-		}
-		return temp;
-	}
+        printf("%d\t%s\t%g\t\t%g\t\t%g\t\t%g\t\t%g\t\t%g\n",                  //输出职工信息
+		zggz0[i].gongh,
+		zggz0[i].name,
+		zggz0[i].gwgz,
+		zggz0[i].xinjgz,
+		zggz0[i].zwjt,
+		zggz0[i].xiaojgz,
+		zggz0[i].yfgz,
+		zggz0[i].sfgz);
+	 }
+    printf("即将返回菜单  ");
+  	system("pause");
+    menu();
+};//浏览
 
-	inline bool StringIsNumber(std::string str)
-	{
-		for (size_t i = 0; i < str.length(); i++)
-		{
-			if (str.at(i) < '0' || str.at(i) > '9')
-			{
-				return false;
-			}
-		}
-		return true;
-	}
-
-	inline bool IsExistFile(string csPath)
-	{
-		int nRet = _access(csPath.c_str(), 0);
-		return 0 == nRet || EACCES == nRet;
-	}
-
-	inline float StringToFloat(string str)
-	{
-		return (float)atof(str.c_str());
-	}
-}
-#endif 
-struct WorkerInfo
+void modify()
 { 
-	string id;		//工号
-	string name;	//姓名
-	float gwgz;		//岗位工资 
-	float xjgz;		//薪级工资
-	float zwjt;     //职务津贴
-	float jxgz;     //绩效工资
-	float yfgz;		//应发工资
-	float grssds;	//个人所得税
-	float sfgz;		//实发工资
-
-	void Print()
-	{
-		cout << "*****************************************************************************\r\n";
-		cout << "工号：" << id << " 姓名：" << name << endl;
-		cout << "岗位工资：" << gwgz << " 薪级工资：" << xjgz << " 职务津贴：" << zwjt << " 绩效工资：" << jxgz << endl;
-		cout << "应发工资：" << yfgz << " 个人所得税：" << grssds << " 实发工资：" << sfgz << endl;
-		cout << "*****************************************************************************\r\n";
-	}
-};
-class WagesManager
-{
-public:
-	WagesManager()
-	{
-		this->Read();
-	}
-
-	bool IsExistWorker(string id)
-	{
-		return this->Get(id) != _works.end();
-	}
-
-	//4.1读取职工工资数据函数：read()
-	void Read()
-	{
-		_works.clear();
-		if (Utility::IsExistFile("gx.dat"))  //数据文件存在
-		{
-			fstream fs;
-			fs.open("gx.dat", ios::in | ios::out);
-			char buff[1024] = {0};
-			while (fs.getline(buff, 1024)) 
-			{
-				auto vec = Utility::SplitString(buff, "="); 
-	
-				WorkerInfo wi;
-				wi.id = vec.at(0);								//工号
-				wi.name = vec.at(1);							//姓名
-				wi.gwgz = Utility::StringToFloat(vec.at(2));	//岗位工资 
-				wi.xjgz = Utility::StringToFloat(vec.at(3));	//薪级工资
-				wi.zwjt = Utility::StringToFloat(vec.at(4));	//职务津贴
-				wi.jxgz = Utility::StringToFloat(vec.at(5));    //绩效工资
-				wi.yfgz = Utility::StringToFloat(vec.at(6));	//应发工资
-				wi.grssds = Utility::StringToFloat(vec.at(7));	//个人所得税
-				wi.sfgz = Utility::StringToFloat(vec.at(8));	//实发工资
-
-				_works.push_back(wi);
-			}
-			fs.close();
-		}
-	}
-
-	//4.2保存职工工资数据函数：save()
-	void Save()
-	{
-		ofstream fs("gx.dat");
-		for (auto it = _works.begin(); it != _works.end(); it++)
-		{
-			fs << it->id << "=" << it->name << "=" << it->gwgz << "=" << it->xjgz << "=" <<
-				it->zwjt<< "=" << it->jxgz << "=" << it->yfgz << "=" << it->grssds << "=" << it->sfgz << endl;
-		}
-		fs.close();
-	}
-
-	//4.3查询职工工资数据函数：find()
-	void Find(const string &id)
-	{
-		auto result = this->Get(id);
-		if (result != _works.end())
-			result->Print();
-	}
-
-	//4.4浏览职工工资数据函数：listInfo()
-	void ListInfo()
-	{
-		for (auto it = _works.begin(); it != _works.end(); it++)
-		{
-			it->Print();
-		}
-	}
-
-	//4.5修改职工工资数据函数：modify()
-	void Modify(const string &id, float postWages, float paySalary, float jobAllowance, float performancePay)
-	{
-		auto result = this->Get(id);
-		if (result != _works.end())
-		{
-			result->gwgz = postWages;
-			result->xjgz = paySalary;
-			result->zwjt = jobAllowance;
-			result->jxgz = performancePay;
-			grsds(id);
-			Save(); 
-		}
-	}
-
-	//4.6删除职工工资数据函数：del()
-	void del(const string &id)
-	{
-		auto result = this->Get(id);
-		if (result != _works.end())
-		{
-			_works.erase(result);
-			Save(); 
-		}
-	}
-
-	//4.7添加职工工资数据函数：add()
-	bool add(const string &id, const string &name, float postWages, float paySalary, float jobAllowance, float performancePay)
-	{
-		if (!Utility::StringIsNumber(id))
-			return false;
-
-		auto result = this->Get(id);
-		if (result == _works.end())
-		{
-			WorkerInfo wi;
-			wi.id = id;								//工号
-			wi.name = name;							//姓名
-			wi.gwgz = postWages;				    //岗位工资 
-			wi.xjgz = paySalary;				    //薪级工资
-			wi.zwjt = jobAllowance;			        //职务津贴
-			wi.jxgz = performancePay;               //绩效工资
-
-			_works.push_back(wi);			//插入到双向链表尾部
-			this->grsds(id);				
-
-			Save();
-			return true;
-		}
-		return false;
-	}
-
-
-	//4.8计算个人所得税函数：grsds()
-	/*不超过500元的，税率5%，速算扣除数为0； 
-      超过500元至2000元的部分，税率10%，速算扣除数为25 
-      超过2000元至5000元的部分，税率15 %，速算扣除数为125 
-      超过5000元至20000元的部分，税率20 %，速算扣除数为375 
-      超过20000元至40000元的部分，税率25%，速算扣除数为1375 
-      超过40000元至60000元的部分，税率30%，速算扣除数为3375 
-      超过60000元至80000元的部分，税率35%，速算扣除数为6375 
-      超过80000元至100000元的部分，税率40%，速算扣除数为10375 
-      超过100000元的部分，税率45%，速算扣除数为15375 */
-
-	void grsds(const string &id)
-	{
-		auto w = this->Get(id);
-		if (w != _works.end())
-		{
-			//应发工资 = 岗位工资 +薪级工资+职务津贴+绩效工资
-			w->yfgz = w->gwgz + w->xjgz + w->zwjt + w->jxgz;
-
-			//3500起增点
-			float a = w->yfgz - 3500;
-
-			//不够3500
-			if (a <= 0)
-			{
-				w->grssds = 0;
-				w->sfgz = w->yfgz;
-			}
-			else
-			{
-				//应纳个人所得税税额=应纳税所得额×适用税率-速算扣除数
-				if (a > 0 && a <= 500)
-					w->grssds = a * 0.05f - 0;
-				else if (a > 500 && a <= 2000)
-					w->grssds = a * 0.1f - 25;
-				else if (a > 2000 && a <= 5000)
-					w->grssds = a * 0.15f - 125;
-				else if (a > 5000 && a <= 20000)
-					w->grssds = a * 0.2f - 375;
-				else if (a > 20000 && a <= 40000)
-					w->grssds = a * 0.25f - 1375;
-				else if (a > 40000 && a <= 60000)
-					w->grssds = a * 0.3f - 3375;
-				else if (a > 60000 && a <= 80000)
-					w->grssds = a * 0.35f - 6375;
-				else if (a > 80000 && a <= 100000)
-					w->grssds = a * 0.4f - 103755;
-				else
-					w->grssds = a * 0.45f - 15505;
-
-				//实收工资 = 应付工资 - 税
-				w->sfgz = w->yfgz - w->grssds;
-			}
-		}
-	}
-private:
-	//通过职工工号id返回双向链表迭代器指针
-	list<WorkerInfo>::iterator Get(string id)
-	{
-		list<WorkerInfo>::iterator result = _works.end();
-		for (auto it = _works.begin(); it != _works.end(); it++)
-		{
-			if (id == it->id)
-			{
-				result = it;
-				break;
-			}
-		}
-		return result;
-	}
-
-	list<WorkerInfo> _works;  
-};
-
-//显示界面
-void ShowMainMenu()
-{
-	system("cls");
-	printf("*************************************************************************\n");
-	printf("*                             1查询员工资料                             *\n");
-	printf("*                             2修改员工资料                             *\n");
-	printf("*                             3添加员工资料                             *\n");
-	printf("*                             4删除员工资料                             *\n");
-	printf("*                             5保存员工资料                             *\n");
-	printf("*                             6浏览员工资料                             *\n");
-	printf("*                             7退出员工系统                             *\n");
-	printf("*************************************************************************\n");
-	printf("\n");
-	printf("                       *请输入你想要选择操作的序号*                      \n");
-	printf("-------------------------------------------------------------------------\n");
-}
-
+    int k,i=0,w,a1,a2,a3,a4;
+	zggz *q;//指向结构体中的一个对象
+    loop:   printf("请输入你要修改的工号： \n");
+		  scanf("%d",&k);//cin>>k;
+		  for(int j=0;j<number;j++)
+		  {      
+		      if (k==zggz0[j].gongh)
+		  {
+		  printf("职员信息如下：");
+		  printf("工号\t姓名\t岗位工资\t薪级工资\t职务工资\t效绩工资\t应发工资\t实发工资\n");
+          printf("%d\t%s\t%g\t\t%g\t\t%g\t\t%g\t\t%g\t\t%g\n",                                             //输出即将修改的职工信息
+			 zggz0[i].gongh,
+			 zggz0[i].name,
+			 zggz0[i].gwgz,
+			 zggz0[i].xinjgz,
+			 zggz0[i].zwjt,
+			 zggz0[i].xiaojgz,
+			 zggz0[i].yfgz,
+			 zggz0[i].sfgz);
+	     printf("修改后的岗位工资:   \n"); 
+         scanf("%d",&a1);
+		 printf("修改后的薪级工资：  \n");
+		 scanf("%d",&a2);
+		 printf("修改后的职务津贴：  \n");
+		 scanf("%d",&a3);
+		 printf("修改后的效绩工资：  \n");
+		 scanf("%d",&a4);
+		 zggz0[j].gwgz=a1;                                                               //给修改的职工信息重新赋值
+		 zggz0[j].xinjgz=a2;
+		 zggz0[j].zwjt=a3;
+		 zggz0[j].xiaojgz=a4;
+		 zggz0[j].yfgz=a1+a2+a3+a4;
+		 zggz0[j].grs=grsds(zggz0[j].sfgz);
+		 zggz0[j].sfgz=zggz0[j].yfgz-zggz0[j].grs;
+		 i=j;
+		 q=zggz0;
+		 printf("修改成功，保存（1），放弃保存，返回菜单（任意键）\n");                     //修改成功确认是否保存
+		 scanf("%d",&w);
+		 if(w==1)
+			 write(q,number);//oup
+		 else
+		 menu();
+		 }    
+		 }
+         if(i!=j)
+		  {
+		       printf("没有这个职员的信息，重新查询（1），菜单（任意键）\n");               //修改失败，未搜索到输入的职工号，询问是否重新输入或返回菜单
+		       scanf("%d",&w);
+		       if(w==1)
+		   {
+		        goto loop;
+		   }
+		   else 
+		   {
+			    menu();
+		   }
+		  }
+};//修改
